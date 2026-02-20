@@ -15,6 +15,7 @@ open import DPPL.Properties.Typing R
 
 open import Lib.Prelude
 open import Lib.Data.Fin
+open import Lib.Data.Finset
 open import Lib.Syntax.EvalCtx
 open import Lib.Syntax.Env
 
@@ -36,7 +37,7 @@ module Progress (Ax : EvalAssumptions) where
 
   progress-det (tlam _)                = inl vlam
   progress-det treal                   = inl vreal
-  progress-det (tvar H∈)               = absurd (¬mem-[] (env-sub→dom-⊆ H∈ _ hereₛ))
+  progress-det (tvar H∈)               = absurd (¬mem-[] (env-sub→dom-sub H∈ _ hereₛ))
   progress-det (tapp Hty Hty₁)         = inr $ case (progress-det Hty) of λ where
     (inr (t' , Hstep)) → _ , cong-stepᵈ (λ _ ()) Hstep
     (inl Hv) → case (progress-det Hty₁) of λ where
@@ -84,8 +85,8 @@ module Progress (Ax : EvalAssumptions) where
           _ , cong-stepᵈ (λ { ₀ (s≤s 0≤x) → Hv ; ₁ (s≤s (s≤s 0≤x)) → Hv₁ }) Hstep
         (inl Hv₂) → _ , estep (esolve Hv Hv₁ Hv₂)
   progress-det (tsub {e = det} Hty _ _) = progress-det Hty
-  progress-det (tpromote {Γ} Hty _ H⊆) rewrite Id≃path.from (env-sub-nil-inv Γ H⊆) =
-    progress-det Hty
+  progress-det (tpromote {Γ} Hty _ H⊆)
+    rewrite Id≃path.from (env-sub-dom-eq H⊆ ∈Ø-elim) = progress-det Hty
 
 
   progress-rnd :
@@ -154,5 +155,5 @@ module Progress (Ax : EvalAssumptions) where
   progress-rnd (tsub {e = det} Hty _ _) with progress-det Hty
   ... | inr (_ , Hstep) = inr $ _ , →det⊆→rnd Hstep
   ... | inl Hv          = inl Hv
-  progress-rnd (tpromote {Γ} Hty _ H⊆) rewrite Id≃path.from (env-sub-nil-inv Γ H⊆) =
-    progress-rnd Hty
+  progress-rnd (tpromote {Γ} Hty _ H⊆)
+    rewrite Id≃path.from (env-sub-dom-eq H⊆ ∈Ø-elim) = progress-rnd Hty

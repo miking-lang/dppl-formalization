@@ -3,7 +3,7 @@ open import Lib.Algebra.Reals
 module DPPL.Properties.Typing (R : Reals₀) where
 
 open import DPPL.Regularity
-open import DPPL.Syntax R
+open import DPPL.Syntax R renaming (_▸_ to _▹_)
 open import DPPL.Typing R
 
 open import Lib.Prelude
@@ -39,19 +39,19 @@ tsub-refl {tdist T}        = sdist tsub-refl
 ∉-dom-fv :
   {x : 𝔸}
   (_ : Γ ⊢ t :[ e ] T)
-  (_ : x ∉ env-dom Γ)
+  (_ : x ∉ dom Γ)
   → ------------------
   x ∉ fv t
 ∉-dom-fv (tsub Hty _ _) H∉      = ∉-dom-fv Hty H∉
 ∉-dom-fv (tpromote Hty _ H⊆) H∉ =
-  ∉-dom-fv Hty (false→is-no λ H∈ → is-no→false H∉ (env-sub→dom-⊆ H⊆ _ H∈))
+  ∉-dom-fv Hty (false→is-no λ H∈ → is-no→false H∉ (env-sub→dom-sub H⊆ _ H∈))
 ∉-dom-fv (tvar H∈) H∉ = ∉∷
-  (false→is-no λ p → is-no→false H∉ (env-sub→dom-⊆ H∈ _ (hereₛ' (Id≃path.from p))))
+  (false→is-no λ p → is-no→false H∉ (env-sub→dom-sub H∈ _ (hereₛ' (Id≃path.from p))))
   tt
 ∉-dom-fv {Γ = Γ} {x = x} (tlam {t = t} (Иi As Hty)) H∉ =
   let y , H∉y = fresh{𝔸} ([ x ] ∪ As)
       H∉' = ∉-dom-fv {x = x} (Hty y ⦃ ∉∷₂ H∉y ⦄)
-        $ subst (_ ∉_) (sym $ env-dom-cons Γ) (∉∷ (sym≠ _ _ (∉∷₁ H∉y)) H∉)
+        $ subst (_ ∉_) (sym $ dom-cons Γ) (∉∷ (sym≠ _ _ (∉∷₁ H∉y)) H∉)
   in ∉∪ (open-notin (t ₀) H∉') tt
 ∉-dom-fv (tapp {ts = ts} Hty Hty₁) H∉ = ∉⋃' (fv ∘ ts)
   $ Fin-cases (∉-dom-fv Hty H∉)
@@ -113,8 +113,8 @@ weaken-typing : Γ ⊢ t :[ e ] T → Γ ⊆ Γ' → Γ' ⊢ t :[ e ] T
 weaken-typing (tsub Hty H≤ H<:) H⊆     = tsub (weaken-typing Hty H⊆) H≤ H<:
 weaken-typing (tpromote Hty H≤ H⊆') H⊆ = tpromote Hty H≤ (env-sub-trans H⊆' H⊆)
 weaken-typing (tvar H∈) H⊆             = tvar (env-sub-trans H∈ H⊆)
-weaken-typing {Γ' = Γ'} (tlam (Иi As Hty)) H⊆ = tlam $ Иi (As ∪ env-dom Γ') λ a →
-  weaken-typing (Hty a ⦃ ∉∪₁ auto ⦄) (env-sub-cons reflᵢ (∉∪₂ As auto) H⊆)
+weaken-typing {Γ' = Γ'} (tlam (Иi As Hty)) H⊆ = tlam $ Иi (As ∪ dom Γ') λ a →
+  weaken-typing (Hty a ⦃ ∉∪₁ auto ⦄) (sub-cons' (∉∪₂ As auto) H⊆)
 weaken-typing (tapp Hty Hty₁) H⊆ =
   tapp (weaken-typing Hty H⊆) (weaken-typing Hty₁ H⊆)
 weaken-typing (tprim Hϕ Hty) H⊆         = tprim Hϕ (weaken-typing Hty H⊆)
@@ -123,19 +123,115 @@ weaken-typing (ttup Htys) H⊆            = ttup λ i → weaken-typing (Htys i)
 weaken-typing (tproj i Hty) H⊆          = tproj i (weaken-typing Hty H⊆)
 weaken-typing (tif Hty Hty₁ Hty₂ H≤) H⊆ =
   tif (weaken-typing Hty H⊆) (weaken-typing Hty₁ H⊆) (weaken-typing Hty₂ H⊆) H≤
-weaken-typing tuniform H⊆            = tuniform
-weaken-typing (tsample Hty) H⊆       = tsample (weaken-typing Hty H⊆)
-weaken-typing (tweight Hty) H⊆       = tweight (weaken-typing Hty H⊆)
-weaken-typing (tinfer Hty) H⊆        = tinfer (weaken-typing Hty H⊆)
+weaken-typing tuniform H⊆                 = tuniform
+weaken-typing (tsample Hty) H⊆            = tsample (weaken-typing Hty H⊆)
+weaken-typing (tweight Hty) H⊆            = tweight (weaken-typing Hty H⊆)
+weaken-typing (tinfer Hty) H⊆             = tinfer (weaken-typing Hty H⊆)
 weaken-typing (tdiff Hty Hty₁ Hty₂ Hc) H⊆ =
   tdiff (weaken-typing Hty H⊆) (weaken-typing Hty₁ H⊆) (weaken-typing Hty₂ H⊆) Hc
 weaken-typing (tsolve Hty Hty₁ Hty₂ Hc) H⊆ =
   tsolve (weaken-typing Hty H⊆) (weaken-typing Hty₁ H⊆) (weaken-typing Hty₂ H⊆) Hc
 
+tsub-env-refl : Γ <:ᵉ Γ
+tsub-env-refl {Γ = ε}           = snil
+tsub-env-refl {Γ = _ ▸ _ [ _ ]} = scons tsub-refl tsub-env-refl
+
+tsub-env-dom : Γ' <:ᵉ Γ → dom Γ' ≡ dom Γ
+tsub-env-dom snil                        = refl
+tsub-env-dom (scons {Γ' = Γ'} {Γ} _ H<:) = ap ([ _ ] ∪_) (tsub-env-dom H<:)
+
+scons' : T' <: T → Γ' <:ᵉ Γ → (Γ' , a ∶ T') <:ᵉ (Γ , a ∶ T)
+scons' {Γ' = Γ'} {Γ} {a} H<: H<:ᵉ with holds? (a ∈ dom Γ') | holds? (a ∈ dom Γ)
+... | yes _  | yes _  = H<:ᵉ
+... | yes H∈ | no  H∉ = absurd (H∉ (subst (_ ∈ᶠˢ_) (tsub-env-dom H<:ᵉ) H∈))
+... | no  H∉ | yes H∈ = absurd (H∉ (subst (_ ∈ᶠˢ_) (sym $ tsub-env-dom H<:ᵉ) H∈))
+... | no  _  | no  _  = scons H<: H<:ᵉ
+
+tsub-env-sub :
+  {Γ₁ Γ₂ Γ₁' : TyEnv}
+  (_ : Γ₂ <:ᵉ Γ₁)
+  (_ : Γ₁' ⊆ Γ₁)
+  → -------------------------------------
+  Σ[ Γ₂' ∈ TyEnv ] Γ₂' <:ᵉ Γ₁' × Γ₂' ⊆ Γ₂
+tsub-env-sub H<:ᵉ sub-nil = ε , snil , sub-nil'
+tsub-env-sub (scons {T' = T'} H<: H<:ᵉ) (sub-cons {x = a , _} {H∉ = H∉} H⊆) =
+  let Γ₂' , H<:' , H⊆' = tsub-env-sub H<:ᵉ H⊆
+      H∉' : a ∉ dom Γ₂'
+      H∉' = false→is-no (is-no→false H∉ ∘ subst (_ ∈ᶠˢ_) (tsub-env-dom H<:'))
+  in
+  (Γ₂' ▸ a , T' [ H∉' ]) , scons H<: H<:' , sub-cons H⊆'
+tsub-env-sub (scons H<: H<:ᵉ) (sub-consr H⊆) =
+  let Γ₂' , H<:' , H⊆' = tsub-env-sub H<:ᵉ H⊆ in
+  Γ₂' , H<:' , sub-consr H⊆'
+
+≤ᵗ-<:-trans :
+  (_ : T ≤ᵗ c)
+  (_ : T' <: T)
+  → ------------
+  T' ≤ᵗ c
+≤ᵗ-<:-trans H≤ (sreal H≤')           = Reg↓≤.≤-trans H≤' H≤
+≤ᵗ-<:-trans H≤ (stup H<:) i          = ≤ᵗ-<:-trans (H≤ i) (H<: i)
+≤ᵗ-<:-trans H≤ (sarr H<: H<:₁ H≤' _) = Reg↓≤.≤-trans H≤' H≤
+≤ᵗ-<:-trans H≤ (sdist _)             = tt
+
+≤ᵉ-<:ᵉ-trans :
+  (_ : Γ ≤ᵉ c)
+  (_ : Γ' <:ᵉ Γ)
+  → -------------
+  Γ' ≤ᵉ c
+≤ᵉ-<:ᵉ-trans H≤ (scons H<: H<:ᵉ) (sub-cons _) =
+  ≤ᵗ-<:-trans (H≤ (sub-cons sub-nil')) H<:
+≤ᵉ-<:ᵉ-trans H≤ (scons H<: H<:ᵉ) (sub-consr H∈) =
+  ≤ᵉ-<:ᵉ-trans (H≤ ∘ sub-consr) H<:ᵉ H∈
+
+tsub-env :
+  (_ : Γ ⊢ t :[ e ] T)
+  (_ : Γ' <:ᵉ Γ)
+  → ---------------------
+  Γ' ⊢ t :[ e ] T
+tsub-env (tsub Hty H≤ H<:') H<: = tsub (tsub-env Hty H<:) H≤ H<:'
+tsub-env (tpromote Hty H≤ H⊆) H<: with Γ₁' , H<:' , H⊆' ← tsub-env-sub H<: H⊆ =
+  tpromote (tsub-env Hty H<:') (≤ᵉ-<:ᵉ-trans H≤ H<:') H⊆'
+tsub-env (tvar H∈) H<: with _ , scons H<:' snil , H∈' ← tsub-env-sub H<: H∈ =
+  tsub (tvar H∈') Eff≤.≤-refl H<:'
+tsub-env (tlam (Иi As Hty)) H<: = tlam $ Иi As λ x → tsub-env (Hty x) (scons' tsub-refl H<:)
+tsub-env (tapp Hty Hty₁) H<:    = tapp (tsub-env Hty H<:) (tsub-env Hty₁ H<:)
+tsub-env (tprim Hϕ Hty) H<:     = tprim Hϕ (tsub-env Hty H<:)
+tsub-env treal H<:              = treal
+tsub-env (ttup Htys) H<:        = ttup λ i → tsub-env (Htys i) H<:
+tsub-env (tproj i Hty) H<:      = tproj i (tsub-env Hty H<:)
+tsub-env (tif Hty Hty₁ Hty₂ H≤) H<: =
+  tif (tsub-env Hty H<:) (tsub-env Hty₁ H<:) (tsub-env Hty₂ H<:) H≤
+tsub-env tuniform H<:                 = tuniform
+tsub-env (tsample Hty) H<:            = tsample (tsub-env Hty H<:)
+tsub-env (tweight Hty) H<:            = tweight (tsub-env Hty H<:)
+tsub-env (tinfer Hty) H<:             = tinfer (tsub-env Hty H<:)
+tsub-env (tdiff Hty Hty₁ Hty₂ Hc) H<: =
+  tdiff (tsub-env Hty H<:) (tsub-env Hty₁ H<:) (tsub-env Hty₂ H<:) Hc
+tsub-env (tsolve Hty Hty₁ Hty₂ Hc) H<: =
+  tsolve (tsub-env Hty H<:) (tsub-env Hty₁ H<:) (tsub-env Hty₂ H<:) Hc
+
+tlam-inv :
+  {T₀ T₁ T₂ : Ty}
+  {t : Tm ^ 1}
+  (_ : Γ ⊢ lam T₀ ▹ t :[ e ] T)
+  (_ : T ≡ᵢ T₁ ⇒[ c , e' ] T₂)
+  → ---------------------------------------------
+  И[ a ∈ 𝔸 ] Γ , a ∶ T₁ ⊢ conc (t ₀) a :[ e' ] T₂
+tlam-inv (tlam Hlam) reflᵢ                              = Hlam
+tlam-inv {Γ} (tsub Hty H≤ (sarr H<:₁ H<:₂ Hc He)) reflᵢ =
+  let Иi As Hlam = tlam-inv Hty reflᵢ
+  in  Иi As λ a →
+    tsub-env (tsub (Hlam a) He H<:₂) (scons' {Γ' = Γ} H<:₁ tsub-env-refl)
+tlam-inv {Γ} (tpromote {T = _ ⇒[ _ , _ ] _} Hty H≤ H⊆) reflᵢ =
+  let Иi As Hlam = tlam-inv Hty reflᵢ
+  in  Иi (As ∪ dom Γ) λ a ⦃ H∉ ⦄ →
+    weaken-typing (Hlam a ⦃ ∉∪₁ H∉ ⦄) (sub-cons' (∉∪₂ As H∉) H⊆)
+
 ttup-inv :
   {vs : Tm ^ n}
   {Ts : Ty ^ n}
-  (_ : Γ ⊢ tup n ▸ vs :[ e ] T)
+  (_ : Γ ⊢ tup n ▹ vs :[ e ] T)
   (_ : T ≡ᵢ ttup n Ts)
   → ---------------------------
   ∀ i → Γ ⊢ vs i :[ e ] Ts i
@@ -148,7 +244,7 @@ ttup-inv (tpromote {T = ttup _ _} Hty H≤ H⊆) reflᵢ i =
 
 tinfer-inv :
   {v : Tm ^ 1}
-  (_ : Γ ⊢ infer ▸ v :[ e ] T)
+  (_ : Γ ⊢ infer ▹ v :[ e ] T)
   → T ≡ᵢ tdist T'
   → -----------------------------------
   Γ ⊢ v ₀ :[ e ] tunit ⇒[ M↓ , rnd ] T'
@@ -167,16 +263,18 @@ subst-pres-typing :
   (_ : Γ' ⊢ t :[ e ] T₁)
   → --------------------------
   Γ ⊢ (x => u) t :[ e ] T₁
-subst-pres-typing {x = x} reflᵢ Hu (tvar {a = a} H∈) with x ≡? a
-... | yes x≡a with reflᵢ ← env-mem-inv (env-mem-++r (subst (_∈ᶠˢ _) x≡a hereₛ) H∈) =
-  weaken-typing Hu env-sub-nil
-... | no x≠a = tvar (env-mem-++l (∉∷ (false→is-no (x≠a ∘ sym)) tt) H∈)
+subst-pres-typing {Γ = Γ} {x = x} reflᵢ Hu (tvar {a = a} H∈) with x ≡? a
+... | yes x≡a with sub-cons _ ←
+  env-sub-strengthenr {Γ₂' = Γ} H∈ (λ a' → subst (a' ∈ᶠˢ_) (sym $ ap [_] x≡a)) =
+  weaken-typing Hu sub-nil'
+... | no x≠a = tvar $ env-sub-strengthenl H∈ λ _ H∈' → false→is-no $
+  ∈ᶠˢ-split (λ where reflᵢ → ∈ᶠˢ-split (λ where reflᵢ → x≠a refl) ¬mem-[] H∈') ¬mem-[]
 subst-pres-typing {Γ = Γ} {x = x} {u = u} {T₂ = T₂} reflᵢ Hu
   (tlam {T = T} {e} {T'} {t = t} (Иi As Hty)) = tlam $ Иi ([ x ] ∪ As) λ a ⦃ H∉ ⦄ →
   let Heq : (x => u)((0 ~> a) (t ₀)) ≡ (0 ~> a)((x => u) (t ₀))
       Heq = subst-open-comm (t ₀) (sym≠ a x (∉∷₁ H∉)) (lc-at→≻ _ _ $ well-typed→lc Hu)
   in subst (λ x → _ ⊢ x :[ _ ] _) Heq
-     $ subst-pres-typing (Id≃path.from (env-cons-& _ _)) Hu (Hty a ⦃ ∉∷₂ H∉ ⦄)
+     $ subst-pres-typing (Id≃path.from (&-cons-distr {Γ' = Γ})) Hu (Hty a ⦃ ∉∷₂ H∉ ⦄)
 subst-pres-typing HΓ Hu (tapp Hty Hty₁) =
   tapp (subst-pres-typing HΓ Hu Hty) (subst-pres-typing HΓ Hu Hty₁)
 subst-pres-typing HΓ Hu (tprim Hϕ Hty) = tprim Hϕ (subst-pres-typing HΓ Hu Hty)
@@ -188,10 +286,10 @@ subst-pres-typing HΓ Hu (tif Hty Hty₁ Hty₂ H≤) = tif
   (subst-pres-typing HΓ Hu Hty₁)
   (subst-pres-typing HΓ Hu Hty₂)
   H≤
-subst-pres-typing HΓ Hu tuniform            = tuniform
-subst-pres-typing HΓ Hu (tsample Hty)       = tsample (subst-pres-typing HΓ Hu Hty)
-subst-pres-typing HΓ Hu (tweight Hty)       = tweight (subst-pres-typing HΓ Hu Hty)
-subst-pres-typing HΓ Hu (tinfer Hty)        = tinfer (subst-pres-typing HΓ Hu Hty)
+subst-pres-typing HΓ Hu tuniform      = tuniform
+subst-pres-typing HΓ Hu (tsample Hty) = tsample (subst-pres-typing HΓ Hu Hty)
+subst-pres-typing HΓ Hu (tweight Hty) = tweight (subst-pres-typing HΓ Hu Hty)
+subst-pres-typing HΓ Hu (tinfer Hty)  = tinfer (subst-pres-typing HΓ Hu Hty)
 subst-pres-typing HΓ Hu (tdiff Hty Hty₁ Hty₂ Hc) = tdiff
   (subst-pres-typing HΓ Hu Hty)
   (subst-pres-typing HΓ Hu Hty₁)
@@ -204,43 +302,17 @@ subst-pres-typing HΓ Hu (tsolve Hty Hty₁ Hty₂ Hc) = tsolve
   Hc
 subst-pres-typing HΓ Hu (tsub Hty H≤ H<:) = tsub (subst-pres-typing HΓ Hu Hty) H≤ H<:
 subst-pres-typing {Γ = Γ} {x = x} reflᵢ Hu
-  (tpromote {Γ = Γ'} Hty H≤ H⊆) with holds? (x ∈ env-dom Γ')
-... | yes H∈
-  with Γ'' , H⊆' , Heq , H∉ ← env-sub-split H∈ H⊆
-  rewrite Id≃path.from Heq = tpromote
+  (tpromote {Γ = Γ'} Hty H≤ H⊆) with holds? (x ∈ dom Γ')
+... | yes H∈ with Γ'' , p , H⊆' , Hdisj ←
+  env-sub-&-diffl {Γ₂' = Γ}
+    (λ _ → ∈ᶠˢ-split (λ where reflᵢ → H∈) (λ Hε → absurd (¬mem-[] Hε))) H⊆
+  rewrite Id≃path.from p = tpromote
     (subst-pres-typing reflᵢ Hu Hty)
-    (λ H∈ → H≤ (env-sub-trans H∈ (env-sub-&r H∉ env-sub-refl)))
+    (λ H∈ → H≤ (env-sub-trans H∈ (env-sub-weakenl env-sub-refl Hdisj)))
     H⊆'
 ... | no H∉ = tpromote
   (subst (_ ⊢_:[ _ ] _) (sym $ subst-fresh _ _ (∉-dom-fv Hty (false→is-no H∉))) Hty)
   H≤
-  (env-sub-strengthen (false→is-no H∉) H⊆)
+  (env-sub-strengthenl H⊆ λ _ H∈ →
+    false→is-no $ ∈ᶠˢ-split (λ where reflᵢ → H∉ H∈) ¬mem-[])
 
-
--- Here we gather assumptions that were left unproven due to lack of time.
-record TempAssumptions : Type where
-  field
-    tsub-env :
-      {T₁ T₂ : Ty}
-      (_ : Γ , a ∶ T₁ ⊢ t :[ e ] T)
-      (_ : T₂ <: T₁)
-      → ---------------------
-      Γ , a ∶ T₂ ⊢ t :[ e ] T
-
-module _ (TAx : TempAssumptions) where
-  open TempAssumptions TAx
-  tlam-inv :
-    {T₀ T₁ T₂ : Ty}
-    {t : Tm ^ 1}
-    (_ : Γ ⊢ lam T₀ ▸ t :[ e ] T)
-    (_ : T ≡ᵢ T₁ ⇒[ c , e' ] T₂)
-    → ---------------------------------------------
-    И[ a ∈ 𝔸 ] Γ , a ∶ T₁ ⊢ conc (t ₀) a :[ e' ] T₂
-  tlam-inv (tlam Hlam) reflᵢ                              = Hlam
-  tlam-inv {Γ} (tsub Hty H≤ (sarr H<:₁ H<:₂ Hc He)) reflᵢ =
-    let Иi As Hlam = tlam-inv Hty reflᵢ
-    in  Иi As λ a → tsub-env {Γ = Γ} (tsub (Hlam a) He H<:₂) H<:₁
-  tlam-inv {Γ} (tpromote {T = _ ⇒[ _ , _ ] _} Hty H≤ H⊆) reflᵢ =
-    let Иi As Hlam = tlam-inv Hty reflᵢ
-    in  Иi (As ∪ env-dom Γ) λ a ⦃ H∉ ⦄ →
-      weaken-typing (Hlam a ⦃ ∉∪₁ H∉ ⦄) (env-sub-cons reflᵢ (∉∪₂ As H∉) H⊆)

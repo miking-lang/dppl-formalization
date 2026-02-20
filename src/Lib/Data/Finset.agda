@@ -35,6 +35,9 @@ module FinsetSyntax where
   _∪_ : Finset A → Finset A → Finset A
   _∪_ = _<>_
 
+∈Ø-elim : {B : A → Type ℓ'} (a : A) → a ∈ᶠˢ [] → B a
+∈Ø-elim _ H∈ = absurd (¬mem-[] H∈)
+
 ∷≠[] : ∀ {x : A} {xs} → ¬ x ∷ xs ≡ []
 ∷≠[] {A = A} p = subst (λ x → ∣ distinguish x ∣) p tt where
   distinguish : Finset A → Prop lzero

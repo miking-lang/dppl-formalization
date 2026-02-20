@@ -17,10 +17,10 @@ open import Lib.Syntax.Env
 
 open SyntaxVars
 
-module Soundness (Ax : EvalAssumptions) (PAx : PresAssumptions Ax) (TAx : TempAssumptions) where
+module Soundness (Ax : EvalAssumptions) (PAx : PresAssumptions Ax) where
   open Eval Ax
   open Progress Ax
-  open Preservation Ax PAx TAx
+  open Preservation Ax PAx
 
   type-system-sound-det :
     (_ : ε ⊢ t :[ det ] T)

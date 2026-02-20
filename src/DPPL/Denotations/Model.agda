@@ -143,22 +143,17 @@ module Denotations {o} {l} (model : DPPL-model o l) where
   ∩ᵗ-is-□ (tdist _)          = □-pres-top
   ∩ᵗ-is-□ (_ ⇒[ _ , rnd ] _) = □-pres-top
 
-  raw-env-≤-□
-    : {l : RawEnv Ty} → is-nubbed l → (∀ {x} → raw-sub (x ∷ []) l → x .snd ≤ᵗ c)
-    → □⟨ c ⟩ .F₀ ⟦ l ⟧ ≅ ⟦ l ⟧
-  raw-env-≤-□ [] H≤                                    = □-pres-top
-  raw-env-≤-□ {c = c} {l = (a , T) ∷ l} (H∉ ∷ Hnub) H≤ =
+  env-≤-□ : {Γ : Env Ty} → Γ ≤ᵉ c → □⟨ c ⟩ .F₀ ⟦ Γ ⟧ ≅ ⟦ Γ ⟧
+  env-≤-□ {Γ = ε} H≤                               = □-pres-top
+  env-≤-□ {c} {Γ ▸ a , T [ H∉ ]} H≤ =
     let p : c ∩ᵗ T ≡ T
-        p = ≤ᵗ→∩ᵗ (H≤ (sub-cons reflᵢ H∉ sub-nil))
-        Hl : □⟨ c ⟩ .F₀ (RawEnv-denot l) ≅ RawEnv-denot l
-        Hl = raw-env-≤-□ Hnub λ H∈ → H≤ (sub-consr tt H∈)
+        p = ≤ᵗ→∩ᵗ (H≤ (sub-cons sub-nil'))
+        Hl : □⟨ c ⟩ .F₀ (Env-denot Γ) ≅ Env-denot Γ
+        Hl = env-≤-□ λ H∈ → H≤ (sub-consr H∈)
         HT : □⟨ c ⟩ .F₀ (Ty-denot T) ≅ Ty-denot T
         HT = ∩ᵗ-is-□ T ∙Iso path→iso (ap Ty-denot p)
     in
-    □-pres-prod (RawEnv-denot l) (Ty-denot T) ∙Iso (Hl ⊗Iso HT)
-
-  env-≤-□ : Γ ≤ᵉ c → □⟨ c ⟩ .F₀ ⟦ Γ ⟧ ≅ ⟦ Γ ⟧
-  env-≤-□ {Γ = Γ} H≤ = raw-env-≤-□ (env-nub-is-nubbed Γ) (H≤ ⊙ env-mem-nub)
+    □-pres-prod (Env-denot Γ) (Ty-denot T) ∙Iso (Hl ⊗Iso HT)
 
   Tm-denot : Γ ⊢ t :[ det ] T → Hom ⟦ Γ ⟧ ⟦ T ⟧
   Tm-denot (tsub {e = det} Hty _ H<:)       = Sub-denot H<: ∘ Tm-denot Hty
@@ -167,9 +162,9 @@ module Denotations {o} {l} (model : DPPL-model o l) where
   Tm-denot (tvar H∈)             = π₂ ∘ env-proj H∈
   Tm-denot (tlam {e = rnd} Hlam) = !
   Tm-denot {Γ} (tlam {T = T} {e = det} {T'} (Иi As Hty))
-    with (a , H∉) ← fresh{𝔸} (As ∪ env-dom Γ) = □⟨A⟩-Id .from .η _ ∘ ƛ body
+    with (a , H∉) ← fresh{𝔸} (As ∪ dom Γ) = □⟨A⟩-Id .from .η _ ∘ ƛ body
     where
-      body = subst (λ Γ → Hom ⟦ Γ ⟧ _) (env-nub-cons Γ (∉∪₂ As H∉))
+      body = subst (λ Γ → Hom ⟦ Γ ⟧ _) (cons-∉ {Γ = Γ} (∉∪₂ As H∉))
         (Tm-denot (Hty a ⦃ ∉∪₁ H∉ ⦄))
   Tm-denot (tapp {T = T} {T' = T'} Hty Hty₁) =
     ev ∘ ⟨ □⟨A⟩-Id .to .η _ ∘ Tm-denot Hty , Tm-denot Hty₁ ⟩

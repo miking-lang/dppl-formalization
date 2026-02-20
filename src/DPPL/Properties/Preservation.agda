@@ -14,7 +14,7 @@ open import Lib.Data.Finset
 open import Lib.Data.Vector
 open import Lib.LocallyNameless.Unfinite
 open import Lib.LocallyNameless.BindingSignature
-open import Lib.Syntax.Env hiding (_∷_)
+open import Lib.Syntax.Env
 open import Lib.Syntax.EvalCtx
 open import Lib.Syntax.Substitution
 
@@ -112,8 +112,9 @@ preservation-ctx {t₁ = t₁} {t₂} (ectx {o} {j = j} {ts} _) Ht₁₂ Hty =
       → ----------------------------------------------------------------
       ε ⊢ o ▸ updateAt ts (ord {o = o} j) t :[ e ] T
     go (tsub Hty H≤ H<:) = λ j Ht → tsub (go Hty j Ht) H≤ H<:
-    go (tpromote Hty H≤ H⊆) rewrite Id≃path.from (env-sub-nil-inv _ H⊆) = λ j Ht →
-      tpromote (go Hty j Ht) H≤ env-sub-nil
+    go (tpromote Hty H≤ H⊆)
+      rewrite Id≃path.from (env-sub-dom-eq H⊆ ∈Ø-elim) = λ j Ht →
+      tpromote (go Hty j Ht) H≤ sub-nil
     go (tapp Hty Hty₁) =
       Fin-cases (λ Ht → tapp (Ht Hty) Hty₁)
       $ Fin-cases (λ Ht → tapp Hty (Ht Hty₁)) λ ()
@@ -165,7 +166,7 @@ module _ (Ax : EvalAssumptions) where
         → --------------------------------------
         Γ ⊢ Infer (_ , v) p .fst :[ e ] T
 
-  module Preservation (PAx : PresAssumptions) (TAx : TempAssumptions) where
+  module Preservation (PAx : PresAssumptions) where
     open PresAssumptions PAx
 
     preservation-det-step :
@@ -176,16 +177,16 @@ module _ (Ax : EvalAssumptions) where
     preservation-det-step (tsub Hty H≤ H<:) Hstep =
       tsub (preservation-det-step Hty Hstep) H≤ H<:
     preservation-det-step (tpromote {Γ = Γ} Hty H≤ H⊆) Hstep
-      rewrite Id≃path.from (env-sub-nil-inv Γ H⊆) = tpromote
+      rewrite Id≃path.from (env-sub-dom-eq H⊆ ∈Ø-elim) = tpromote
       (preservation-det-step Hty Hstep)
-      (λ H∈ → absurd (¬mem-[] (env-sub→dom-⊆ H∈ _ hereₛ)))
-      env-sub-nil
+      (λ H∈ → ∈Ø-elim _ (env-sub→dom-sub H∈ _ hereₛ))
+      sub-nil
     preservation-det-step (tapp Hty Hty₁) (eapp {t = t} Heq Hv) =
-      let Иi As Hty' = tlam-inv TAx (subst (_ ⊢_:[ _ ] _) Heq Hty) reflᵢ
+      let Иi As Hty' = tlam-inv (subst (_ ⊢_:[ _ ] _) Heq Hty) reflᵢ
           x , H∉     = fresh{𝔸} (As ∪ fv (t ₀))
       in  subst (_ ⊢_:[ _ ] _) (sym $ subst-intro (t ₀) (∉∪₂ As H∉))
           $ subst-pres-typing
-            (Id≃path.from (sym $ env-&-idl _))
+            (Id≃path.from (sym $ &-idl _))
             (val-type-det Hty₁ Hv)
             (Hty' x ⦃ ∉∪₁ H∉ ⦄)
     preservation-det-step (tprim {ϕ} {c} {e = e} H∈ Hty) (eprim {rs = rs} Heq) =
@@ -193,7 +194,7 @@ module _ (Ax : EvalAssumptions) where
         (ap treal (order→∩ (subst (c ≤_) A↓-is-top !)))
         $ tpromote {Γ = ε}
           (tsub treal (lift tt) (sreal ≤-refl))
-          (λ H∈ → absurd (¬mem-[] (env-sub→dom-⊆ H∈ _ hereₛ)))
+          (λ H∈ → ∈Ø-elim _ (env-sub→dom-sub H∈ _ hereₛ))
           env-sub-refl
     preservation-det-step (tproj i Hty) (eproj .i Heq Hv) =
       ttup-inv (subst (_ ⊢_:[ _ ] _) Heq Hty) reflᵢ i
@@ -223,10 +224,10 @@ module _ (Ax : EvalAssumptions) where
     preservation-rnd-step (tsub Hty H≤ H<:) Hstep =
       tsub (preservation-rnd-step Hty Hstep) H≤ H<:
     preservation-rnd-step (tpromote {Γ = Γ} Hty H≤ H⊆) Hstep
-      rewrite Id≃path.from (env-sub-nil-inv Γ H⊆) = tpromote
+      rewrite Id≃path.from (env-sub-dom-eq H⊆ ∈Ø-elim) = tpromote
       (preservation-rnd-step Hty Hstep)
-      (λ H∈ → absurd (¬mem-[] (env-sub→dom-⊆ H∈ _ hereₛ)))
-      env-sub-nil
+      (λ H∈ → ∈Ø-elim _ (env-sub→dom-sub H∈ _ hereₛ))
+      sub-nil
     preservation-rnd-step Hty (edet Hstep) = preservation-det-step Hty Hstep
     preservation-rnd-step (tweight Hty) (eweight Heq) = ttup λ ()
     preservation-rnd-step tuniform (euniform {p = p}) =
@@ -234,7 +235,7 @@ module _ (Ax : EvalAssumptions) where
         (ap treal (order→∩ (subst (M↓ ≤_) A↓-is-top !)))
         $ tpromote {Γ = ε}
           (tsub treal (lift tt) (sreal ≤-refl))
-          (λ H∈ → absurd (¬mem-[] (env-sub→dom-⊆ H∈ _ hereₛ)))
+          (λ H∈ → ∈Ø-elim _ (env-sub→dom-sub H∈ _ hereₛ))
           env-sub-refl
     preservation-rnd-step (tsample Hty) (esample Heq Hv) =
       InferPres (tinfer-inv (subst (_ ⊢_:[ _ ] _) Heq Hty) reflᵢ) Hv
