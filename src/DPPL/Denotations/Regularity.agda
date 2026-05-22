@@ -1,5 +1,6 @@
 open import 1Lab.Prelude
 
+open import Data.Nat.Base using (H-Level-≤)
 open import Data.Power
 
 open import DPPL.Regularity

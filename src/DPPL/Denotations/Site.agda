@@ -1,6 +1,8 @@
 open import Cat.Functor.Properties
 open import Cat.Prelude
 
+open import Data.Nat.Base using (H-Level-≤)
+
 open import DPPL.Denotations.Regularity
 open import DPPL.Regularity
 

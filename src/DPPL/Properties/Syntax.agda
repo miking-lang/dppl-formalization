@@ -18,8 +18,8 @@ open SyntaxVars
 
 ≤ᵗ→∩ᵗ : T ≤ᵗ X → X ∩ᵗ T ≡ T
 ≤ᵗ→∩ᵗ {T = treal c} H≤ = ap treal $ ext λ x → Ω-ua
-  (λ Hx → case Hx of λ y x≤y Hy Hy' → c .pres-≤ x≤y Hy')
-  (λ Hx → case H≤ (x , Hx) of λ y Hy Hy' x≤y → inc (y , x≤y , Hy , Hy'))
+  (λ Hx → case Hx of λ y x≤y x≤y' Hy Hy' → c .pres-≤ (x≤y , x≤y') Hy')
+  (λ Hx → case H≤ (x , Hx) of λ y Hy Hy' x≤y x≤y' → inc (y , (x≤y , x≤y') , Hy , Hy'))
 ≤ᵗ→∩ᵗ {T = T ⇒[ _ ] T'} H≤ = ap (T ⇒[_] T') (∩-comm ∙ order→∩ H≤)
 ≤ᵗ→∩ᵗ {T = ttup n _} H≤    = ap (ttup n) (ext λ i → ≤ᵗ→∩ᵗ (H≤ i))
 
