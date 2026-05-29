@@ -1,6 +1,6 @@
 open import Data.Finset.Base hiding (_∷_)
 open import Data.Fin.Base hiding (_≤_)
-open import Data.Power using (singleton)
+open import Data.Power using (singleton ; _∪_)
 
 open import Jacana.Regularity
 
@@ -21,7 +21,7 @@ open import Jacana.SmallStep R
 open import Jacana.Syntax R
 open import Jacana.Typing R
 
-open FinsetSyntax
+open FinsetSyntax renaming (_∪_ to _∪ᶠ_)
 open VectorSyntax
 open SyntaxVars
 open TypingVars
@@ -102,17 +102,21 @@ module _ (Ax : EvalAssumptions) where
         (_ : Γ ⊢ t₀ ∶ treals m (make c) ⇒[ singleton P ] treals n (make c))
         (_ : Γ ⊢ t₁ ∶ treals m (make c))
         (_ : Γ ⊢ t₂ ∶ treals m (make A↓))
-        (_ : c ≡ A↓ ⊎ c ≡ P↓)
+        (Hc : (c ≡ A↓ × X ≡ singleton S ∪ singleton A)
+            ⊎ (c ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ P↓ × X ≡ singleton P))
         (v₀ : is-value t₀) (v₁ : is-value t₁) (v₂ : is-value t₂)
         → -------------------------------------------------------------------
         Γ ⊢ Diff (_ , v₀) (_ , v₁) (_ , v₂) .fst ∶ treals n (make A↓)
 
       SolvePres :
         {t₀ t₁ t₂ : Tm}
-        (_ : Γ ⊢ t₀ ∶ treals (1 + n) (c ∷ make A↓) ⇒[ singleton C ] treals n (make A↓))
-        (_ : Γ ⊢ t₁ ∶ treals (1 + n) (c ∷ make A↓))
-        (_ : Γ ⊢ t₂ ∶ treal (c Reg↓-lat.∩ PC↓))
-        (_ : c ≡ A↓ ⊎ c ≡ C↓)
+        (_ : Γ ⊢ t₀ ∶ treal c ⇒[ X ] (treals n (make c') ⇒[ X ] treals n (make c')))
+        (_ : Γ ⊢ t₁ ∶ treals (1 + n) (c ∷ make c'))
+        (_ : Γ ⊢ t₂ ∶ treal (c Reg↓-lat.∩ PL↓))
+        (Hc : (c ≡ A↓ × c' ≡ A↓ × X ≡ singleton C ∪ singleton S ∪ singleton A)
+            ⊎ (c ≡ C↓ × c' ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ C↓ × c' ≡ L↓ × X ≡ singleton C))
         (v₀ : is-value t₀) (v₁ : is-value t₁) (v₂ : is-value t₂)
         → -----------------------------------------------------------------------
         Γ ⊢ Solve (_ , v₀) (_ , v₁) (_ , v₂) .fst ∶ treals (1 + n) (make A↓)
@@ -136,7 +140,7 @@ module _ (Ax : EvalAssumptions) where
     preservation-step (tapp Hty Hty₁) (eapp {t = t} Heq Hv) =
       let
         T' , H<: , Иi As Hty' = tlam-inv (subst (_ ⊢_∶ _) Heq Hty) reflᵢ
-        x , H∉ = fresh{𝔸} (As ∪ fv (t ₀))
+        x , H∉ = fresh{𝔸} (As ∪ᶠ fv (t ₀))
       in
       subst (_ ⊢_∶ _) (sym $ subst-intro (t ₀) (∉∪₂ As H∉))
         $ subst-pres-typing reflᵢ (tsub Hty₁ H<:) (Hty' x ⦃ ∉∪₁ H∉ ⦄)

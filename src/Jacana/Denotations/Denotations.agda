@@ -8,7 +8,7 @@ open import Jacana.Denotations.Regularity
 open import Jacana.Regularity
 
 open import Data.Sum.Base
-open import Data.Power using (singleton)
+open import Data.Power using (singleton ; _∪_)
 
 open import Lib.Algebra.Reals
 open import Lib.Homotopy.Join renaming (_∗_ to _∨_)
@@ -84,27 +84,42 @@ record DenotAssumptions : Type where
       → cond-denot ⊙ ⟨ g₁ , ⟨ g₂ , g₃ ⟩ ⟩ ∈ ⟨ cs ⟩-sec' U
 
     diff-denot
-      : ∀ m n → c ≡ A↓ ⊎ c ≡ P↓
+      : ∀ m n
+        (Hc : (c ≡ A↓ × X ≡ singleton S ∪ singleton A)
+            ⊎ (c ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ P↓ × X ≡ singleton P))
       → ∫ₚ ⟨ make {n = m} c ∥ make {n = n} c ⟩-reg × ℝ ^ m × ℝ ^ m
       → ℝ ^ n
 
     diff-reg
-      : ∀ m n (Hc : c ≡ A↓ ⊎ c ≡ P↓) {U g₁ g₂ g₃}
+      : ∀ m n
+        (Hc : (c ≡ A↓ × X ≡ singleton S ∪ singleton A)
+            ⊎ (c ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ P↓ × X ≡ singleton P))
+        {U g₁ g₂ g₃}
       → g₁ ∈ ⟨ make c ∣ singleton P ∣ make c ⟩-hom-sec U
       → g₂ ∈ ⟨ make c ⟩-sec' U
       → g₃ ∈ ⟨ make A↓ ⟩-sec' U
       → diff-denot m n Hc ⊙ ⟨ g₁ , ⟨ g₂ , g₃ ⟩ ⟩ ∈ ⟨ make A↓ ⟩-sec' U
 
+    -- TODO: Add the explicit characterization for these properties like above
     solve-denot
-      : ∀ n → c ≡ A↓ ⊎ c ≡ C↓
-      → ∫ₚ ⟨ c ∷ make {n = n} A↓ ∥ make {n = n} A↓ ⟩-reg × ℝ ^ (1 + n) × ℝ
+      : ∀ n
+        (Hc : (c ≡ A↓ × c' ≡ A↓ × X ≡ singleton C ∪ singleton S ∪ singleton A)
+            ⊎ (c ≡ C↓ × c' ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ C↓ × c' ≡ L↓ × X ≡ singleton C))
+      → ⌞ 𝔇ℝ[ c ] ⇒ □⟨ X ⟩₀ (𝔇ℝ'[ make {n = n} c' ] ⇒ 𝔇ℝ'[ make {n = n} c' ]) ⌟ × ℝ ^ (1 + n) × ℝ
       → ℝ ^ (1 + n)
 
     solve-reg
-      : ∀ n (Hc : c ≡ A↓ ⊎ c ≡ C↓) {U g₁ g₂ g₃}
-      → g₁ ∈ ⟨ c ∷ make A↓ ∣ singleton C ∣ make A↓ ⟩-hom-sec U
-      → g₂ ∈ ⟨ c ∷ make A↓ ⟩-sec' U
-      → g₃ ∈ ⟨ c Reg↓-lat.∩ PC↓ ⟩-sec U
+      : ∀ n
+        (Hc : (c ≡ A↓ × c' ≡ A↓ × X ≡ singleton C ∪ singleton S ∪ singleton A)
+            ⊎ (c ≡ C↓ × c' ≡ S↓ × X ≡ singleton S)
+            ⊎ (c ≡ C↓ × c' ≡ L↓ × X ≡ singleton C))
+         {U g₁ g₂ g₃}
+      → g₁ ∈ □⟨ X ⟩₀ (𝔇ℝ[ c ] ⇒ □⟨ X ⟩₀ (𝔇ℝ'[ make {n = n} c' ] ⇒ 𝔇ℝ'[ make {n = n} c' ])) .snd .is-sec U
+      → g₂ ∈ ⟨ c ∷ make c' ⟩-sec' U
+      → g₃ ∈ ⟨ c Reg↓-lat.∩ PL↓ ⟩-sec U
       → solve-denot n Hc ⊙ ⟨ g₁ , ⟨ g₂ , g₃ ⟩ ⟩ ∈ ⟨ make A↓ ⟩-sec' U
 
 mk-hom-sec
@@ -150,10 +165,7 @@ module _ (Ax' : DenotAssumptions) where
         Hg₂
         Hg₃
     ; 𝔇-solve = λ {c} n Hc → ∫hom (solve-denot n Hc) λ g (Hg₁ , Hg₂ , Hg₃) →
-      solve-reg n Hc
-        (mk-hom-sec (c ∷ make A↓) (singleton C) (make A↓) Hg₁)
-        Hg₂
-        Hg₃
+      solve-reg n Hc Hg₁ Hg₂ Hg₃
     }
 
   open Denotations model public

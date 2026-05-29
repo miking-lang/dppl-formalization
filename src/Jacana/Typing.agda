@@ -146,15 +146,19 @@ data _⊢_∶_ : TyEnv → Tm → Ty → Type where
     (Hty : Γ ⊢ ts ₀ ∶ treals m (make c) ⇒[ singleton P ] treals n (make c))
     (Hty₁ : Γ ⊢ ts ₁ ∶ treals m (make c))
     (Hty₂ : Γ ⊢ ts ₂ ∶ treals m (make A↓))
-    (Hc : c ≡ A↓ ⊎ c ≡ P↓)
+    (Hc : (c ≡ A↓ × X ≡ singleton S ∪ singleton A)
+        ⊎ (c ≡ S↓ × X ≡ singleton S)
+        ⊎ (c ≡ P↓ × X ≡ singleton P))
     → ---------------------------------------------------------------------
     Γ ⊢ diff ▸ ts ∶ treals n (make A↓)
 
   tsolve :
     {ts : Tm ^ 3}
-    (Hty : Γ ⊢ ts ₀ ∶ treals (1 + n) (c ∷ᵛ make A↓) ⇒[ singleton C ] treals n (make A↓))
-    (Hty₁ : Γ ⊢ ts ₁ ∶ treals (1 + n) (c ∷ᵛ make A↓))
-    (Hty₂ : Γ ⊢ ts ₂ ∶ treal (c Reg↓-lat.∩ PC↓))
-    (Hc : c ≡ A↓ ⊎ c ≡ C↓)
-    → ----------------------------------------------------------------------------------
+    (Hty : Γ ⊢ ts ₀ ∶ treal c ⇒[ X ] (treals n (make c') ⇒[ X ] treals n (make c')))
+    (Hty₁ : Γ ⊢ ts ₁ ∶ treals (1 + n) (c ∷ᵛ make c'))
+    (Hty₂ : Γ ⊢ ts ₂ ∶ treal (c Reg↓-lat.∩ PL↓))
+    (Hc : (c ≡ A↓ × c' ≡ A↓ × X ≡ singleton C ∪ singleton S ∪ singleton A)
+        ⊎ (c ≡ C↓ × c' ≡ S↓ × X ≡ singleton S)
+        ⊎ (c ≡ C↓ × c' ≡ L↓ × X ≡ singleton C))
+    → -----------------------------------------------------------------------
     Γ ⊢ solve ▸ ts ∶ treals (1 + n) (make A↓)

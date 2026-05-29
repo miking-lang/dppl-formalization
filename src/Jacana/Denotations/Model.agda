@@ -7,7 +7,7 @@ open import Cat.Prelude
 
 open import Data.Fin.Base
 open import Data.Sum.Base
-open import Data.Power using (singleton)
+open import Data.Power using (singleton ; _∪_)
 
 open import Jacana.Regularity
 
@@ -27,7 +27,7 @@ import Jacana.Typing as Typing
 module Jacana.Denotations.Model (R : Reals₀) where
 
 open SyntaxProperties R
-open FinsetSyntax
+open FinsetSyntax renaming (_∪_ to _∪ᶠ_)
 open VectorSyntax
 open Syntax R
 open Typing R
@@ -78,14 +78,22 @@ record is-Jacana-model {o ℓ} (𝔇 : Precategory o ℓ) : Type (o ⊔ ℓ) whe
       : (cs : Reg↓ ^ n) (_ : ∀ i → P↓ ⊆ cs i)
       → Hom (𝔇ℝ[ P↓ ] ⊗₀ 𝔇ℝ'[ cs ] ⊗₀ 𝔇ℝ'[ cs ]) 𝔇ℝ'[ cs ]
     𝔇-diff
-      : ∀ m n → c ≡ A↓ ⊎ c ≡ P↓ → Hom
+      : ∀ m n
+      → ((c ≡ A↓ × X ≡ singleton S ∪ singleton A)
+      ⊎ (c ≡ S↓ × X ≡ singleton S)
+      ⊎ (c ≡ P↓ × X ≡ singleton P))
+      → Hom
         (□⟨ singleton P ⟩ .F₀ (𝔇ℝ'[ make {n = m} c ] ⇒ 𝔇ℝ'[ make {n = n} c ]) ⊗₀ 𝔇ℝ'[ make {n = m} c ] ⊗₀ 𝔇ℝ'[ make {n = m} A↓ ])
         𝔇ℝ'[ make {n = n} A↓ ]
     𝔇-solve
-      : ∀ n → c ≡ A↓ ⊎ c ≡ C↓ → Hom
-        (□⟨ singleton C ⟩ .F₀ (𝔇ℝ'[ c ∷ make {n = n} A↓ ] ⇒ 𝔇ℝ'[ make {n = n} A↓ ])
-         ⊗₀ 𝔇ℝ'[ c ∷ make {n = n} A↓ ]
-         ⊗₀ 𝔇ℝ[ c Reg↓-lat.∩ PC↓ ])
+      : ∀ n
+      → ((c ≡ A↓ × c' ≡ A↓ × X ≡ singleton C ∪ singleton S ∪ singleton A)
+       ⊎ (c ≡ C↓ × c' ≡ S↓ × X ≡ singleton S)
+       ⊎ (c ≡ C↓ × c' ≡ L↓ × X ≡ singleton C))
+      → Hom
+        (□⟨ X ⟩ .F₀ (𝔇ℝ[ c ] ⇒ □⟨ X ⟩ .F₀ (𝔇ℝ'[ make {n = n} c' ] ⇒ 𝔇ℝ'[ make {n = n} c' ]))
+         ⊗₀ 𝔇ℝ'[ c ∷ make {n = n} c' ]
+         ⊗₀ 𝔇ℝ[ c Reg↓-lat.∩ PL↓ ])
         𝔇ℝ'[ make {n = 1 + n} A↓ ]
 
   □-ip
@@ -146,7 +154,7 @@ module Denotations {o} {ℓ} (model : Jacana-model o ℓ) where
     ∩ᵗ-is-□ T H~ .to ∘ □⟨ X ⟩ .F₁ (Tm-denot Hty) ∘ env-≤-□ H≤ .from ∘ env-proj H⊆
   Tm-denot (tvar H∈) = π₂ ∘ env-proj H∈
   Tm-denot {Γ} (tlam {T = T} {T'} (Иi As Hty))
-    with (a , H∉) ← fresh{𝔸} (As ∪ dom Γ) = □⟨⊤⟩-Id .η _ ∘ ƛ body
+    with (a , H∉) ← fresh{𝔸} (As ∪ᶠ dom Γ) = □⟨⊤⟩-Id .η _ ∘ ƛ body
     where
       body = subst (λ Γ → Hom ⟦ Γ ⟧ _) (cons-∉ {Γ = Γ} (∉∪₂ As H∉))
         (Tm-denot (Hty a ⦃ ∉∪₁ H∉ ⦄))
