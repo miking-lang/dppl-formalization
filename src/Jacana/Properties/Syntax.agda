@@ -1,15 +1,15 @@
 open import 1Lab.Prelude
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.Algebra.Reals
 
 open import Order.Lattice
 open import Order.Base
 
-import DPPL.Syntax as Syntax
+import Jacana.Syntax as Syntax
 
-module DPPL.Properties.Syntax (R : Reals₀) where
+module Jacana.Properties.Syntax (R : Reals₀) where
 
 open is-lattice Reg⊆-lat
 open Reg≤

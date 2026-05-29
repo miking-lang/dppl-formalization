@@ -1,4 +1,4 @@
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.LocallyNameless.BindingSignature
 open import Lib.LocallyNameless.Support
@@ -8,7 +8,7 @@ open import Lib.Prelude
 
 open import Order.Base
 
-module DPPL.Syntax (R : Reals₀) where
+module Jacana.Syntax (R : Reals₀) where
 
 open Reals R using (ℝ)
 

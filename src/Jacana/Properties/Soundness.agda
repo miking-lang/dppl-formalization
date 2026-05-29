@@ -2,14 +2,14 @@ open import Lib.Algebra.Reals
 open import Lib.Syntax.Env
 open import Lib.Prelude
 
-module DPPL.Properties.Soundness (R : Reals₀) where
+module Jacana.Properties.Soundness (R : Reals₀) where
 
-open import DPPL.Properties.Preservation R
-open import DPPL.Properties.Progress R
-open import DPPL.Properties.Typing R
-open import DPPL.SmallStep R
-open import DPPL.Syntax R
-open import DPPL.Typing R
+open import Jacana.Properties.Preservation R
+open import Jacana.Properties.Progress R
+open import Jacana.Properties.Typing R
+open import Jacana.SmallStep R
+open import Jacana.Syntax R
+open import Jacana.Typing R
 
 open SyntaxVars
 

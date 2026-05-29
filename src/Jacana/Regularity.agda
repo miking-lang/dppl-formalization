@@ -17,7 +17,7 @@ open import Order.Diagram.Meet
 open import Order.Lattice
 open import Order.Base
 
-module DPPL.Regularity where
+module Jacana.Regularity where
 
 data Reg : Type where
   C L S P A : Reg

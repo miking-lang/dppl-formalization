@@ -1,6 +1,6 @@
 open import Data.Power using (singleton)
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.LocallyNameless.AbstractionConcretion
 open import Lib.LocallyNameless.BindingSignature
@@ -12,9 +12,9 @@ open import Lib.Prelude
 
 open import Order.Base
 
-import DPPL.Syntax as Syntax
+import Jacana.Syntax as Syntax
 
-module DPPL.Typing (R : Reals₀) where
+module Jacana.Typing (R : Reals₀) where
 
 open VectorSyntax using () renaming (_∷_ to _∷ᵛ_)
 open VecSyntax

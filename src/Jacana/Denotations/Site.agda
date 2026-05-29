@@ -3,8 +3,8 @@ open import Cat.Prelude
 
 open import Data.Nat.Base using (H-Level-≤)
 
-open import DPPL.Denotations.Regularity
-open import DPPL.Regularity
+open import Jacana.Denotations.Regularity
+open import Jacana.Regularity
 
 open import Lib.Algebra.Reals
 open import Lib.Homotopy.Join
@@ -13,7 +13,7 @@ open import Lib.Data.Vector
 
 open import Order.Base
 
-module DPPL.Denotations.Site (R : Reals₀) (Ax : RegAssumptions R) where
+module Jacana.Denotations.Site (R : Reals₀) (Ax : RegAssumptions R) where
 
 open RegAssumptions Ax
 open RegProperties R Ax

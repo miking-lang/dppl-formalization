@@ -2,7 +2,7 @@ open import Data.Finset.Base hiding (_∷_)
 open import Data.Fin.Base hiding (_≤_)
 open import Data.Power using (singleton)
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.LocallyNameless.BindingSignature
 open import Lib.LocallyNameless.Unfinite
@@ -14,12 +14,12 @@ open import Lib.Data.Vector
 open import Lib.Syntax.Env
 open import Lib.Prelude
 
-module DPPL.Properties.Preservation (R : Reals₀) where
+module Jacana.Properties.Preservation (R : Reals₀) where
 
-open import DPPL.Properties.Typing R
-open import DPPL.SmallStep R
-open import DPPL.Syntax R
-open import DPPL.Typing R
+open import Jacana.Properties.Typing R
+open import Jacana.SmallStep R
+open import Jacana.Syntax R
+open import Jacana.Typing R
 
 open FinsetSyntax
 open VectorSyntax

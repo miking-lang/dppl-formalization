@@ -7,11 +7,11 @@ open import Lib.Algebra.Reals
 open import Lib.Data.Vector
 open import Lib.Prelude hiding (_*_)
 
-module DPPL.Properties.Determinism (R : Reals₀) where
+module Jacana.Properties.Determinism (R : Reals₀) where
 
-open import DPPL.Properties.SmallStep R
-open import DPPL.SmallStep R
-open import DPPL.Syntax R
+open import Jacana.Properties.SmallStep R
+open import Jacana.SmallStep R
+open import Jacana.Syntax R
 
 open Reals R
 

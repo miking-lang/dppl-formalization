@@ -2,7 +2,7 @@ open import Data.Finset.Base
 open import Data.Dec.Base
 open import Data.Nat.Base using (Nat-is-set)
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.LocallyNameless.AbstractionConcretion
 open import Lib.LocallyNameless.BindingSignature
@@ -18,10 +18,10 @@ open import Lib.Prelude
 
 open import Order.Base
 
-import DPPL.Syntax as Syntax
-import DPPL.Typing as Typing
+import Jacana.Syntax as Syntax
+import Jacana.Typing as Typing
 
-module DPPL.Properties.Typing (R : Reals₀) where
+module Jacana.Properties.Typing (R : Reals₀) where
 
 open Syntax R renaming (_▸_ to _▹_)
 open SyntaxVars

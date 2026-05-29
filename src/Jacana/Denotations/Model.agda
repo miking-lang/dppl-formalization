@@ -9,7 +9,7 @@ open import Data.Fin.Base
 open import Data.Sum.Base
 open import Data.Power using (singleton)
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.LocallyNameless.Unfinite
 open import Lib.Algebra.Reals
@@ -20,11 +20,11 @@ open import Lib.Syntax.Env
 
 open import Order.Base
 
-import DPPL.Properties.Syntax as SyntaxProperties
-import DPPL.Syntax as Syntax
-import DPPL.Typing as Typing
+import Jacana.Properties.Syntax as SyntaxProperties
+import Jacana.Syntax as Syntax
+import Jacana.Typing as Typing
 
-module DPPL.Denotations.Model (R : Reals₀) where
+module Jacana.Denotations.Model (R : Reals₀) where
 
 open SyntaxProperties R
 open FinsetSyntax
@@ -38,7 +38,7 @@ open Functor
 open Reals R using (ℝ)
 open _=>_
 
-record is-DPPL-model {o ℓ} (𝔇 : Precategory o ℓ) : Type (o ⊔ ℓ) where
+record is-Jacana-model {o ℓ} (𝔇 : Precategory o ℓ) : Type (o ⊔ ℓ) where
   field
     𝔇-cartesian : Cartesian-category 𝔇
     𝔇-closed    : Cartesian-closed 𝔇 𝔇-cartesian
@@ -98,11 +98,11 @@ record is-DPPL-model {o ℓ} (𝔇 : Precategory o ℓ) : Type (o ⊔ ℓ) where
     ∙Iso (id-iso ⊗Iso □-ip HX (tail F))
     ∙Iso Π-cons (λ i → □⟨ X ⟩ .F₀ (F i)) Iso⁻¹
 
-DPPL-model : ∀ o ℓ → Type (lsuc (o ⊔ ℓ))
-DPPL-model o ℓ = Σ (Precategory o ℓ) is-DPPL-model
+Jacana-model : ∀ o ℓ → Type (lsuc (o ⊔ ℓ))
+Jacana-model o ℓ = Σ (Precategory o ℓ) is-Jacana-model
 
-module Denotations {o} {ℓ} (model : DPPL-model o ℓ) where
-  open is-DPPL-model (model .snd)
+module Denotations {o} {ℓ} (model : Jacana-model o ℓ) where
+  open is-Jacana-model (model .snd)
 
   Ty-denot : Ty → Ob
   Ty-denot (treal c)      = 𝔇ℝ[ c ]

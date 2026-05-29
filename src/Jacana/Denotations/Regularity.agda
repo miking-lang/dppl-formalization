@@ -3,14 +3,14 @@ open import 1Lab.Prelude
 open import Data.Nat.Base using (H-Level-≤)
 open import Data.Power
 
-open import DPPL.Regularity
+open import Jacana.Regularity
 
 open import Lib.Homotopy.Join
 
 open import Lib.Algebra.Reals
 open import Lib.Data.Vector
 
-module DPPL.Denotations.Regularity where
+module Jacana.Denotations.Regularity where
 
 is-const : ∀ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'} → ℙ (A → B)
 is-const {B = B} f = elΩ $ Σ[ x ∈ B ] f ≡ λ _ → x

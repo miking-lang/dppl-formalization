@@ -5,9 +5,9 @@ open import Lib.Algebra.Reals
 open import Lib.Data.Vector
 open import Lib.Prelude hiding (_*_)
 
-import DPPL.Syntax as Syntax
+import Jacana.Syntax as Syntax
 
-module DPPL.SmallStep (R : Reals₀) where
+module Jacana.SmallStep (R : Reals₀) where
 
 open ListSyntax
 open Interval R

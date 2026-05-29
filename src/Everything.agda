@@ -1,20 +1,20 @@
 module Everything where
 
-open import DPPL.Regularity
-open import DPPL.SmallStep
-open import DPPL.Syntax
-open import DPPL.Typing
+open import Jacana.Regularity
+open import Jacana.SmallStep
+open import Jacana.Syntax
+open import Jacana.Typing
 
-open import DPPL.Denotations.Denotations
-open import DPPL.Denotations.Regularity
-open import DPPL.Denotations.Domain
-open import DPPL.Denotations.Model
-open import DPPL.Denotations.Site
+open import Jacana.Denotations.Denotations
+open import Jacana.Denotations.Regularity
+open import Jacana.Denotations.Domain
+open import Jacana.Denotations.Model
+open import Jacana.Denotations.Site
 
-open import DPPL.Properties.Preservation
-open import DPPL.Properties.Determinism
-open import DPPL.Properties.SmallStep
-open import DPPL.Properties.Soundness
-open import DPPL.Properties.Progress
-open import DPPL.Properties.Syntax
-open import DPPL.Properties.Typing
+open import Jacana.Properties.Preservation
+open import Jacana.Properties.Determinism
+open import Jacana.Properties.SmallStep
+open import Jacana.Properties.Soundness
+open import Jacana.Properties.Progress
+open import Jacana.Properties.Syntax
+open import Jacana.Properties.Typing

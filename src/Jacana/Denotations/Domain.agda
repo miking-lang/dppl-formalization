@@ -9,8 +9,8 @@ open import Cat.Prelude
 
 open import Data.Fin.Base hiding (_≤_)
 
-open import DPPL.Denotations.Regularity
-open import DPPL.Regularity hiding (A)
+open import Jacana.Denotations.Regularity
+open import Jacana.Regularity hiding (A)
 
 open import Lib.Algebra.Reals
 open import Lib.Homotopy.Join
@@ -21,10 +21,10 @@ open import Lib.Cat.Thin
 open import Order.Diagram.Meet
 open import Order.Base
 
-import DPPL.Denotations.Site as Site
-import DPPL.Syntax as Syntax
+import Jacana.Denotations.Site as Site
+import Jacana.Syntax as Syntax
 
-module DPPL.Denotations.Domain (R : Reals₀) (Ax : RegAssumptions R) where
+module Jacana.Denotations.Domain (R : Reals₀) (Ax : RegAssumptions R) where
 
 open RegAssumptions Ax
 open Reg⊆-lat hiding (top ; !)

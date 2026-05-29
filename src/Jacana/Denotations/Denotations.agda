@@ -4,8 +4,8 @@ open import Cat.Diagram.Exponential
 open import Cat.Displayed.Total
 open import Cat.Prelude hiding (_∨_)
 
-open import DPPL.Denotations.Regularity
-open import DPPL.Regularity
+open import Jacana.Denotations.Regularity
+open import Jacana.Regularity
 
 open import Data.Sum.Base
 open import Data.Power using (singleton)
@@ -17,12 +17,12 @@ open import Lib.Data.Vector
 
 open import Order.Base
 
-import DPPL.Denotations.Domain as Domain
-import DPPL.Denotations.Model as Model
-import DPPL.Syntax as Syntax
-import DPPL.Typing as Typing
+import Jacana.Denotations.Domain as Domain
+import Jacana.Denotations.Model as Model
+import Jacana.Syntax as Syntax
+import Jacana.Typing as Typing
 
-module DPPL.Denotations.Denotations (R : Reals₀) (Ax : RegAssumptions R) where
+module Jacana.Denotations.Denotations (R : Reals₀) (Ax : RegAssumptions R) where
 
 open Conc-psh.CPSh-on
 open RegAssumptions Ax
@@ -124,7 +124,7 @@ mk-hom-sec cs X cs' Hf₀ = case Hf₀ of λ where
 module _ (Ax' : DenotAssumptions) where
   open DenotAssumptions Ax'
 
-  model : DPPL-model _ _
+  model : Jacana-model _ _
   model .fst = 𝔇
   model .snd = record
     { 𝔇-cartesian = 𝔇-cartesian

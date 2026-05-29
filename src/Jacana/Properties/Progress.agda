@@ -7,15 +7,15 @@ open import Lib.Syntax.Env
 open import Lib.Data.Fin
 open import Lib.Prelude
 
-module DPPL.Properties.Progress (R : Reals₀) where
+module Jacana.Properties.Progress (R : Reals₀) where
 
--- Proof of progress for the DPPL semantics
+-- Proof of progress for the Jacana semantics
 
-open import DPPL.Properties.SmallStep R
-open import DPPL.Properties.Typing R
-open import DPPL.SmallStep R
-open import DPPL.Syntax R
-open import DPPL.Typing R
+open import Jacana.Properties.SmallStep R
+open import Jacana.Properties.Typing R
+open import Jacana.SmallStep R
+open import Jacana.Syntax R
+open import Jacana.Typing R
 
 open SyntaxVars
 

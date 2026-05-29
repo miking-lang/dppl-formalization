@@ -7,11 +7,11 @@ open import Lib.Syntax.EvalCtx
 open import Lib.Algebra.Reals
 open import Lib.Data.Vector
 
-import DPPL.SmallStep as SmallStep
-import DPPL.Syntax as Syntax
-import DPPL.Typing as Typing
+import Jacana.SmallStep as SmallStep
+import Jacana.Syntax as Syntax
+import Jacana.Typing as Typing
 
-module DPPL.Properties.SmallStep (R : Reals₀) where
+module Jacana.Properties.SmallStep (R : Reals₀) where
 
 -- Minor lemmas about the step relations (and typing)
 
