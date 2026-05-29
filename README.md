@@ -27,10 +27,9 @@ For main points of interest, see the following table.
 The code was developed using a bleeding-edge version of Agda 2.8, along with the 1lab library for cubical Agda.
 You may need to match the commit hashes below to be able to check the proofs.
 
-TODO: Update these! (especially fix/list the dependency on my own fork of 1lab)
 Commits:
-- agda: 0feec2519d580aaf8cc18b791c16790ca738bfd1
-- 1lab: e51776c97deb6faffa48b8d74e1542e43f1d8a42
+- agda: 295c60c79cd49e880b9f07add98462f1b82d26f2
+- 1lab: 02ab3a695da33e06874407e139374e1878f917a9
 
 The proofs are based on an axiomatisation of the real numbers (in `src/Lib/Algebra/Reals.agda`) as well as an axiomatisation of regularity properties such as continuity and piecewise analyticity under analytic partitioning (PAP) (in `src/Jacana/Denotations/Regularity.agda`).
 Furthermore, the denotational semantics rely on some regularity properties of operations like differentiation, which were only proven on paper (listed in `src/Jacana/Denotations/Denotations.agda`).
