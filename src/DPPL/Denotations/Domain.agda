@@ -4,7 +4,6 @@ open import Cat.Diagram.Product.Indexed
 open import Cat.Diagram.Exponential
 open import Cat.Functor.Naturality
 open import Cat.Displayed.Total
-open import Cat.Displayed.Thin
 open import Cat.Cartesian
 open import Cat.Prelude
 
@@ -17,6 +16,7 @@ open import Lib.Algebra.Reals
 open import Lib.Homotopy.Join
 open import Lib.Cat.Concrete
 open import Lib.Data.Vector
+open import Lib.Cat.Thin
 
 open import Order.Diagram.Meet
 open import Order.Base

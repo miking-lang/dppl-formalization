@@ -4,9 +4,10 @@ open import Cat.Functor.Properties
 open import Cat.Diagram.Terminal
 open import Cat.Diagram.Product
 open import Cat.Displayed.Total
-open import Cat.Displayed.Thin
 open import Cat.Cartesian
 open import Cat.Prelude
+
+open import Lib.Cat.Thin
 
 open import Data.Fin.Base
 open import Data.Power
